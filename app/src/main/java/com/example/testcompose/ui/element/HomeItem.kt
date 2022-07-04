@@ -109,6 +109,9 @@ fun HomeListItem(
                 .align(Alignment.Bottom)
                 .padding(noSpace, noSpace, noSpace, normalSpace)
         )
+
+
+
         Spacer(Modifier.width(normalRadius))
 
 
