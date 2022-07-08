@@ -15,12 +15,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.testcompose.R
 import com.example.testcompose.ui.theme.*
+import org.intellij.lang.annotations.JdkConstants
 
 enum class RowType {
     SQUARE
@@ -32,6 +35,7 @@ fun HomeListItem(
     subTitle: String,
     image: Int,
     editing: Boolean,
+    footerText: Boolean,
     type: RowType,
     onClick: () -> Unit
 ) {
@@ -43,7 +47,8 @@ fun HomeListItem(
             RoundedCornerShape(noRadius)
         }
     }
-    Card(modifier = Modifier.padding(normalSpace, normalSpace, normalSpace, normalSpace)
+    Card(modifier = Modifier
+        .padding(normalSpace, normalSpace, normalSpace, normalSpace)
         .clickable(onClick = onClick)
         .fillMaxWidth(),
         elevation = squareRadius) {
@@ -96,6 +101,17 @@ fun HomeListItem(
                     modifier = Modifier
                         .align(Alignment.End)
                 ) {
+                    if (footerText) {
+                        Text(text = "START SHOPPINING",
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
+                            color = homePurple,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = FontFamily.Serif,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold)
+                    }
                     Icon(
                         imageVector = Icons.Filled.KeyboardArrowRight,
                         contentDescription = "forward",
@@ -111,11 +127,17 @@ fun HomeListItem(
 @Preview
 @Composable
 fun TestOrder() {
-    HomeListItem("Order tracking", "Track your latest orders by campaign, number, date and value.", R.drawable.tracking_ic, true, RowType.SQUARE) {}
+    HomeListItem("Order tracking", "Track your latest orders by campaign, number, date and value.", R.drawable.tracking_ic, true, false, RowType.SQUARE) {}
 }
 
 @Preview
 @Composable
 fun TestPending() {
-    HomeListItem("Pending orders", "Review and approve or reject pending customer orders", R.drawable.tracking_ic, false, RowType.SQUARE) {}
+    HomeListItem("Pending orders", "Review and approve or reject pending customer orders", R.drawable.ic_pending, false, false, RowType.SQUARE) {}
+}
+
+@Preview
+@Composable
+fun TestBrouchure() {
+    HomeListItem("Order tracking", "Track your latest orders by campaign, number, date and value.", R.drawable.ic_brouchure, true, true, RowType.SQUARE) {}
 }

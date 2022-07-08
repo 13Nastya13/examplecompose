@@ -85,16 +85,19 @@ fun HomeScreen(countDays : String,
                         "Track your latest orders by campaign, number, date and value.",
                         R.drawable.tracking_ic,
                         true,
+                        false,
                         RowType.SQUARE) {}
                     HomeListItem("Pending orders",
                         "Review and approve or reject pending customer orders",
                         R.drawable.ic_pending,
+                        false,
                         false,
                         RowType.SQUARE) {}
                     HomeListItem("Return order",
                         "Return your order by clicking here",
                         R.drawable.ic_return,
                         true,
+                        false,
                         RowType.SQUARE) {}
                     Column{
                         Text(text = "Place a new order",
@@ -113,7 +116,8 @@ fun HomeScreen(countDays : String,
                     HomeListItem("Avon Brochure",
                         "Now you can browse your digital brouchure to add items to your order and save them for submission.",
                         R.drawable.ic_brouchure,
-                        false,
+                        true,
+                        true,
                         RowType.SQUARE) {}
                 }
             }
