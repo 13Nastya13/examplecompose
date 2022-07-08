@@ -1,7 +1,11 @@
 package com.example.testcompose.ui.element
 
+import android.widget.ScrollView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -24,8 +28,7 @@ import com.example.testcompose.ui.theme.*
 @Composable
 fun HomeScreen(countDays : String,
                campaign : String) {
-    
-    Column {
+    Column() {
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .height(headerHeight)
@@ -67,7 +70,8 @@ fun HomeScreen(countDays : String,
                 }
             }
             Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
                 color = Color.Transparent
             ) {
                 Column {
