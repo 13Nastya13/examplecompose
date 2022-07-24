@@ -4,11 +4,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 
-val primaryTextColor = Color(0xFF444444)
-val primaryColor = Color(0xffadf4ff)
-val subTextColor = Color(0xFF7f7d80)
-val homePurple = Color(0xFF7F00FF)
-val itemBgColor = Color.White
 val normalSpace = 16.dp
 val smallSpace = 8.dp
 val smallerSpace = 4.dp
