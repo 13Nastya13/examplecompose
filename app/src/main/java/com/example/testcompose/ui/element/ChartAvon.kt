@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
@@ -22,19 +24,20 @@ import com.example.testcompose.ui.DataModel
 import kotlin.random.Random
 
 @Composable
-fun DiagramAvon(
+fun ChartAvon(
     modifier: Modifier,
-
-    years: List<Int>,
     steps: List<Int>,
     data: List<DataModel>,
-    paddingSpace: Dp,
-    verticalStep: Int
+    paddingSpace: Dp
 ) {
 
-    val controlPoints1 = mutableListOf<PointF>()
-    val controlPoints2 = mutableListOf<PointF>()
-    val coordinates = mutableListOf<PointF>()
+    var maxData = 0f;
+    for (i in data.indices){
+        if (data[i].index > maxData){
+            maxData = data[i].index
+        }
+    }
+
     val density = LocalDensity.current
     val textPaint = remember(density) {
         Paint().apply {
@@ -51,8 +54,7 @@ fun DiagramAvon(
     {
         Canvas(modifier = Modifier.fillMaxSize(),) {
             val xAxisSpace = (size.width - paddingSpace.toPx()) / steps.size
-            val yAxisSpace = size.height / years.size
-
+            val yAxisSpace = size.height / data.size
 
             /** placing x axis points */
             for (i in steps.indices) {
@@ -62,63 +64,48 @@ fun DiagramAvon(
                     size.height-30,
                     textPaint
                 )
+
+                drawLine(
+                    start = Offset(x = xAxisSpace*(i+1), y = 0f),
+                    end = Offset(x = xAxisSpace*(i+1), y = size.height-30),
+                    color = Color.Gray
+                )
+            }
+
+            /** placing points */
+            for (i in data.indices) {
+                val size = Size(xAxisSpace*(data[i].index/1000)*1f, 40f)
+                val y1 = size.height-yAxisSpace*i
+
+                drawRoundRect(Color.Magenta,
+                    Offset(0f, size.height - y1),
+                    size = size,
+                    cornerRadius = CornerRadius(10f, 10f))
             }
 
             /** placing y axis points */
-            for (i in years.indices) {
+            for (i in data.indices) {
                 drawContext.canvas.nativeCanvas.drawText(
-                    "${years[i]}",
+                    "${data[i].year}",
                     paddingSpace.toPx()/2f,
-                    size.height-yAxisSpace*(i + 1),
+                    size.height-yAxisSpace*(i+1),
                     textPaint
                 )
             }
-
-//            val x1 = xAxisSpace * xValues[i]
-//            val y1 = size.height - (yAxisSpace * (points[i]/verticalStep.toFloat()))
-            /** placing points */
-            for (i in data.indices) {
-                val x1 = xAxisSpace * i
-                val y1 = size.height - (yAxisSpace * (data[i].year/verticalStep.toFloat()))
-                coordinates.add(PointF(x1,y1))
-                drawCircle(
-                    color = Color.Green,
-                    radius = 10f,
-                    center = Offset(x1,y1)
-                )
-            }
-
-
         }
     }
-
 }
 
 @Preview
 @Composable
 fun previewDiagram()
 {
-
-    val yStep = 50
-    val random = Random
-    /* to test with random points */
-    val points = (0..9).map {
-        var num = random.nextInt(350)
-        if (num <= 50)
-            num += 100
-        num.toFloat()
-    }
-
-    DiagramAvon(modifier = Modifier
+    ChartAvon(modifier = Modifier
         .fillMaxWidth()
         .height(500.dp),
-        years = (2018..2021).map { it + 1 },
         steps = (0..5).map { (it + 1) * 1000 },
-        data = (0..4).map { DataModel(it+2018, (it + 1) * 1000) },
-        paddingSpace = 16.dp,
-        verticalStep = yStep )
+        data = listOf(
+            DataModel(2019,  1090f), DataModel(2020,  5750f)
+            , DataModel(2021,  2500f),  DataModel(2022,  2100f)),
+        paddingSpace = 24.dp )
 }
-
-//xValues = (0..9).map { it + 1 },
-//yValues = (0..6).map { (it + 1) * yStep },
-//val points = listOf(150f,100f,250f,200f,330f,300f,90f,120f,285f,199f),
