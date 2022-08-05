@@ -2,10 +2,12 @@ package com.example.testcompose.ui.element
 
 
 import android.graphics.Paint
-import android.graphics.PointF
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -20,46 +22,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.testcompose.ui.DataModel
-import kotlin.random.Random
+import com.example.testcompose.ui.model.DataModel
+import com.example.testcompose.ui.util.ChartUtil
 
 @Composable
 fun ChartAvon(
     modifier: Modifier,
-    steps: List<Int>,
     data: List<DataModel>,
     paddingSpace: Dp
 ) {
 
-    var chartMax = 0
-    var chartStep = 0
-    var chartCountSteps = 0
-
-    var maxData = 0f;
-    for (i in data.indices){
-        if (data[i].index > maxData){
-            maxData = data[i].index
-        }
-    }
-
-    var strMax = maxData.toString().replaceAfter(".","").replace(".","")
-    val tempMax = strMax.subSequence(0,1).toString().toInt()
-    chartCountSteps = strMax.length-1
-
-    strMax = (tempMax+1).toString()
-    var i = 0
-    while (i < chartCountSteps){
-        strMax = strMax + "0"
-        i++
-    }
-
-    chartMax = strMax.toInt()
-    chartStep = chartMax/chartCountSteps
-
-    val xOffset = 80f
-    val yOffset = 250f
+    val dataChart = ChartUtil.getChartMaxsAndStep(data)
     val density = LocalDensity.current
-
 
     val textPaint = remember(density) {
         Paint().apply {
@@ -69,67 +43,72 @@ fun ChartAvon(
         }
     }
 
-    Box(modifier = modifier
-        .background(Color.White)
-        .padding(horizontal = 12.dp, vertical = 12.dp),
-        contentAlignment = Alignment.Center)
+    Box(modifier = Modifier.border(BorderStroke(2.dp, Color.Red), RoundedCornerShape(20.dp)),)
     {
-        Canvas(modifier = Modifier.fillMaxSize(),) {
-            val xAxisSpace = (size.width - paddingSpace.toPx()-xOffset) / steps.size
-            val yAxisSpace = size.height / data.size - 10f
 
-            drawLine(
-                start = Offset(x = xOffset, y = 0f),
-                end = Offset(x = xOffset, y = size.height-30),
-                color = Color.Gray
-            )
+        Box(modifier = modifier
+            .background(Color.White)
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+            contentAlignment = Alignment.Center)
+        {
+            Canvas(modifier = Modifier.fillMaxSize(),) {
 
+                val yOffset = size.height/(data.size*2)
+                val xOffset = size.width/(dataChart.chartCountStep*2)
 
-            /** placing x axis points */
-            for (i in steps.indices) {
-                drawContext.canvas.nativeCanvas.drawText(
-                    "${steps[i]}",
-                    xAxisSpace*(i+1)+xOffset,
-                    size.height-30f,
-                    textPaint
-                )
+                val xAxisSpace = (size.width - paddingSpace.toPx()-xOffset) / dataChart.chartCountStep
+                val yAxisSpace = size.height / data.size - 10f
+
 
                 drawLine(
-                    start = Offset(x = xAxisSpace*(i+1)+xOffset, y = 0f),
-                    end = Offset(x = xAxisSpace*(i+1)+xOffset, y = size.height-30),
+                    start = Offset(x = xOffset, y = 0f),
+                    end = Offset(x = xOffset, y = size.height-30),
                     color = Color.Gray
                 )
+
+                /** placing points */
+                for (i in data.indices) {
+                    val rectHeight = 70f
+                    val sizeRect = Size(xAxisSpace*(data[i].index/dataChart.chartStep)+xOffset, rectHeight)
+                    val y1 = size.height-yAxisSpace*i-rectHeight/2-yOffset
+
+                    drawRoundRect(Color.Magenta,
+                        Offset(0f, y1),
+                        size = sizeRect,
+                        cornerRadius = CornerRadius(10f, 10f))
+                }
+
+                drawRect(color = Color.White, size = Size(xOffset, size.height))
+
+                /** placing x axis points */
+                var i = 0
+                while (i < dataChart.chartCountStep+1) {
+                    drawContext.canvas.nativeCanvas.drawText(
+                        "${dataChart.chartStep*(i)}",
+                        xAxisSpace*i+xOffset,
+                        size.height,
+                        textPaint
+                    )
+
+                    drawLine(
+                        start = Offset(x = xAxisSpace*(i)+xOffset, y = 0f),
+                        end = Offset(x = xAxisSpace*(i)+xOffset, y = size.height-30),
+                        color = Color.Gray
+                    )
+                    i++
+                }
+
+                /** placing y axis points */
+                for (i in data.indices) {
+                    drawContext.canvas.nativeCanvas.drawText(
+                        "${data[i].year}",
+                        paddingSpace.toPx()/2f,
+                        size.height-yAxisSpace*i-yOffset,
+                        textPaint
+                    )
+                }
             }
-
-            /** placing points */
-            for (i in data.indices) {
-                val rectHeight = 70f
-                val sizeRect = Size(xAxisSpace*(data[i].index/1000)+xOffset, rectHeight)
-                val y1 = size.height-yAxisSpace*i-rectHeight/2-yOffset
-
-                drawRoundRect(Color.Magenta,
-                    Offset(0f, y1),
-                    size = sizeRect,
-                    cornerRadius = CornerRadius(10f, 10f))
-            }
-
-            drawRect(color = Color.White, size = Size(xOffset, size.height))
-
-            /** placing y axis points */
-            for (i in data.indices) {
-                drawContext.canvas.nativeCanvas.drawText(
-                    "${data[i].year}",
-                    paddingSpace.toPx()/2f,
-                    size.height-yAxisSpace*i-yOffset,
-                    textPaint
-                )
-            }
-        }
-    }
-}
-
-fun getChartMaxsAndStep(list : List<DataModel>, chartMax : Int, chartStep : Int, chartCountSteps : Int) {
-
+        }}
 }
 
 @Preview
@@ -139,9 +118,17 @@ fun previewDiagram()
     ChartAvon(modifier = Modifier
         .fillMaxWidth()
         .height(500.dp),
-        steps = (0..5).map { (it + 1) * 1000 },
-        data = listOf(DataModel(2018,  980f),
-            DataModel(2019,  1090f), DataModel(2020,  5750f)
-            , DataModel(2021,  2500f),  DataModel(2022,  2100f)),
+        data = listOf(
+//            DataModel(2013,  435f),
+//            DataModel(2014,  700f),
+//            DataModel(2015,  50f),
+//            DataModel(2016,  89f),
+            DataModel(2017,  20f),
+            DataModel(2018,  75f),
+            DataModel(2019,  140f),
+            DataModel(2020,  710f),
+            DataModel(2021,  25f),
+            DataModel(2022,  200f)
+        ),
         paddingSpace = 12.dp )
 }
